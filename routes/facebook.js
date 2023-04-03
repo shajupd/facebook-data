@@ -1,25 +1,24 @@
 var express = require("express");
 var router = express.Router();
-const bizSdk = require("facebook-nodejs-business-sdk");
 
-router.get("/", function(req, res, next) {
-  const accessToken =
-    "EAABllyF5F8MBAKQQ9ffb0vpe8UWanJdJQdCFSDcbOhPcaPn9rweMpvdhyq95WOfd9CBLdR1Jutl3aZCYTDznrjlzmKRy7szZBt0XtaAvF2ZARNLXj0p7dUWZCwDZBveZAZAYFM3SHaqPZCz5xYvel4GE4AEbU1n20yT0BaLqKTZCfTWjLFdZC9BW2HAggrcAnQz04ZD";
-  const accountId = "act_111699776051139";
+router.get("/auth", async function (req, res, next) {
 
-  const FacebookAdsApi = bizSdk.FacebookAdsApi.init(accessToken);
-  const AdAccount = bizSdk.AdAccount;
+  const { code } = req.query
+  const clientId = process.env.clientId
+  const clientSecret = process.env.clientSecret
+  const redirectURI = process.env.redirectURI
 
-  const account = new AdAccount(accountId);
+  let url = `https://graph.facebook.com/v6.0/oauth/access_token?redirect_uri=${redirectURI}&client_id=${clientId}&client_secret=${clientSecret}&code=${code}`
+  const response = await fetch(url);
 
-  account
-    .read([AdAccount.Fields.name])
-    .then(account => {
-      return account.getCampaigns();
-    })
-    .catch(error => {});
+  console.log({
+    message: "Auth responce",
+    data: response
+  });
 
-  res.send("ok!");
+  res.send({ message: url })
+
+
 });
 
 module.exports = router;
